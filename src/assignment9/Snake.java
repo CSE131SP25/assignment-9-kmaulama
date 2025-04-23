@@ -1,5 +1,5 @@
 package assignment9;
-
+//chatgpt was used to assist
 import java.util.LinkedList;
 
 public class Snake {
@@ -9,11 +9,15 @@ public class Snake {
 	private LinkedList<BodySegment> segments;
 	private double deltaX;
 	private double deltaY;
+	private boolean growNextMove = false;
 	
 	public Snake() {
-		//FIXME - set up the segments instance variable
-		deltaX = 0;
-		deltaY = 0;
+		segments = new LinkedList<>();
+	    deltaX = 0;
+	    deltaY = 0;
+	    double startX = 0.5;
+	    double startY = 0.5;
+	    segments.add(new BodySegment(startX, startY, SEGMENT_SIZE));
 	}
 	
 	public void changeDirection(int direction) {
@@ -37,14 +41,29 @@ public class Snake {
 	 * based on the current direction of travel
 	 */
 	public void move() {
-		//FIXME
+		
+				BodySegment head = segments.getFirst();
+				double newX = head.getX() + deltaX;
+				double newY = head.getY() + deltaY;
+				
+				
+				segments.addFirst(new BodySegment(newX, newY, SEGMENT_SIZE)); //adds a new body segment to the front
+				
+			
+				if (!growNextMove) { // if the snake isnt eating something then remove the tail
+					segments.removeLast(); // removes the tail from the snake as it moves
+				} else {
+					growNextMove = false;
+				}
 	}
 	
 	/**
 	 * Draws the snake by drawing each segment
 	 */
 	public void draw() {
-		//FIXME
+		for (BodySegment segment : segments) {
+			segment.draw();
+		}
 	}
 	
 	/**
@@ -53,7 +72,15 @@ public class Snake {
 	 * @return true if the snake successfully ate the food
 	 */
 	public boolean eatFood(Food f) {
-		//FIXME
+		BodySegment head = segments.getFirst();
+		double dx = head.getX() - f.getX();
+		double dy = head.getY() - f.getY();
+		double distance = Math.sqrt(dx * dx + dy * dy);
+		
+		if (distance < SEGMENT_SIZE + Food.FOOD_SIZE) {
+			growNextMove = true;// if the snake eats the food then it'll grow
+			return true;
+		}
 		return false;
 	}
 	
@@ -62,7 +89,11 @@ public class Snake {
 	 * @return whether or not the head is in the bounds of the window
 	 */
 	public boolean isInbounds() {
-		//FIXME
-		return true;
+		BodySegment head = segments.getFirst();
+		double x = head.getX();
+		double y = head.getY();
+		return (x >= 0 && x <= 1.0 && y >= 0 && y <= 1.0);
+	
+		
 	}
 }
